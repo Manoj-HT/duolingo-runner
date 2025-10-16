@@ -162,7 +162,7 @@ async function clickContinue(page: Page, timeout = 3000) {
     "love-challenge-tap-token": "amor-challenge-tap-token",
     "car-challenge-tap-token": "carro-challenge-tap-token",
     "want-challenge-tap-token": "quieres-challenge-tap-token",
-    "please-challenge-tap-token": "favor-challenge-tap-token",
+    "please-challenge-tap-token": "favor-challenge-tap-token por",
     "good morning-challenge-tap-token": "buenos días-challenge-tap-token"
   }
 
