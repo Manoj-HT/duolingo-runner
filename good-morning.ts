@@ -14,7 +14,7 @@ async function clickContinue(page: Page, timeout = 3000) {
   console.log('Launching browser...');
   const browser = await chromium.launchPersistentContext('./profile', {
     headless: false,
-    executablePath: '/usr/bin/chromium',
+    channel: 'chrome',
     args: [
       '--no-sandbox',
       '--disable-blink-features=AutomationControlled',

@@ -10,24 +10,34 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      # Install Node
       - name: Setup Node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: 20
 
-      - name: Install dependencies
+      # Install your project deps
+      - name: Install npm packages
         run: npm install
 
-      # Install Playwright (Chromium only or all browsers)
-      - name: Install Playwright Browsers
-        run: npx playwright install chromium
+      # Install Google Chrome (official Debian package) 
+      - name: Install Google Chrome Stable
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y wget gpg
+          wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo gpg --dearmor -o /usr/share/keyrings/google-linux-signing-keyring.gpg
+          echo "deb [arch=amd64 signed-by=/usr/share/keyrings/google-linux-signing-keyring.gpg] http://dl.google.com/linux/chrome/deb/ stable main" | sudo tee /etc/apt/sources.list.d/google-chrome.list
+          sudo apt-get update
+          sudo apt-get install -y google-chrome-stable
 
-      # Install Xvfb (virtual screen)
-      - name: Install Xvfb
-        run: sudo apt-get install -y xvfb
+      # Install Playwright but skip its own Chrome
+      - name: Install Playwright Dependencies Only
+        run: npx playwright install-deps
 
-      # Run your script inside a virtual display (headless bypass)
-      - name: Run Good Morning Script
+      # Essential: install ONLY the driver for Chrome
+      - name: Install Playwright Chrome Channel (driver only)
+        run: npx playwright install chrome
+
+      # Run script with real Chrome (channel:"chrome")
+      - name: Run Duolingo Script
         run: |
           xvfb-run --auto-servernum --server-args="-screen 0 1280x800x24" npm run good-morning
