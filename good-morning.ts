@@ -12,18 +12,33 @@ async function clickContinue(page: Page, timeout = 3000) {
 
 (async () => {
   console.log('Launching browser...');
-  const browser = await chromium.launch({
-    headless: false,               // Show the browser
-    args: ['--no-sandbox'],        // Optional for Linux
+  const browser = await chromium.launchPersistentContext('./profile', {
+    headless: false,
+    executablePath: '/usr/bin/chromium',
+    args: [
+      '--no-sandbox',
+      '--disable-blink-features=AutomationControlled',
+      '--headless=new',
+      '--disable-web-security',
+      '--disable-features=IsolateOrigins,site-per-process'
+    ],        // Optional for Linux
   });
   console.log('Browser launched.');
 
   console.log('Creating new page...');
   const page = await browser.newPage();
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator, 'webdriver', { get: () => false });
+    Object.defineProperty(navigator, 'plugins', { get: () => [1, 2, 3], });
+    Object.defineProperty(navigator, 'languages', { get: () => ['en-US', 'en'], });
+  });
+  // set user agent
   console.log('New page created.');
 
   console.log('Navigating to Duolingo...');
   await page.goto('https://www.duolingo.com');
+  await page.waitForTimeout(10000);
   console.log('Navigated to Duolingo!');
 
   console.log('Clicking \"have-account\" button...');
@@ -31,23 +46,25 @@ async function clickContinue(page: Page, timeout = 3000) {
   console.log('Button clicked.');
 
   console.log('Filling in login form...');
-  await page.fill('[data-test="email-input"]', '');
-  await page.fill('[data-test="password-input"]', '');
+  await page.fill('[data-test="email-input"]', 'manulogan101@gmail.com'); // <--- add your email
+  await page.fill('[data-test="password-input"]', 'TeAmoGiu.6118'); // <--- add your password
   console.log('Login form filled.');
 
   console.log('Clicking \"login\" button...');
   await page.click('[data-test="register-button"]');
   console.log('Login button clicked.');
-
   console.log('Waiting for 5 seconds...');
+  await page.waitForTimeout(10000);
   await page.waitForTimeout(10000);
   console.log('Wait finished.');
 
+  await page.screenshot({ path: 'full.png', fullPage: true });
   console.log('Navigating to stories page...');
   await page.goto('https://duolingo.com/practice-hub/stories');
   console.log('Navigated to stories page.');
 
   console.log('Clicking "Good Morning" story...');
+  page.screenshot({ path: 'ss.png', fullPage: true })
   await page.locator('text=Good Morning').click();
   console.log('"Good Morning" story clicked.');
 
@@ -161,7 +178,7 @@ async function clickContinue(page: Page, timeout = 3000) {
     "sugar-challenge-tap-token": "azúcar-challenge-tap-token",
     "love-challenge-tap-token": "amor-challenge-tap-token",
     "car-challenge-tap-token": "carro-challenge-tap-token",
-    "want-challenge-tap-token": "quieres-challenge-tap-token",
+    "want-challenge-tap-token you": "quieres-challenge-tap-token",
     "please-challenge-tap-token": "favor-challenge-tap-token por",
     "good morning-challenge-tap-token": "buenos días-challenge-tap-token"
   }
@@ -182,7 +199,7 @@ async function clickContinue(page: Page, timeout = 3000) {
 
   await clickContinue(page, 2000)
 
-    console.log('Finishing story...');
+  console.log('Finishing story...');
   for (let i = 0; i < 3; i++) {
     await clickContinue(page, 5000);
   }
