@@ -1,0 +1,33 @@
+name: duolingo-runner
+
+on:
+  workflow_dispatch:
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      # Install Node
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm install
+
+      # Install Playwright (Chromium only or all browsers)
+      - name: Install Playwright Browsers
+        run: npx playwright install chromium
+
+      # Install Xvfb (virtual screen)
+      - name: Install Xvfb
+        run: sudo apt-get install -y xvfb
+
+      # Run your script inside a virtual display (headless bypass)
+      - name: Run Good Morning Script
+        run: |
+          xvfb-run --auto-servernum --server-args="-screen 0 1280x800x24" npm run good-morning
